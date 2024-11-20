@@ -82,8 +82,8 @@ jobs:
     strategy:
       matrix:
         include:
-          - project: hello_world
-          - project: hello_world_2
+          - project: hello-world
+          - project: hello-world-alt
 
     runs-on: ubuntu-latest
     steps:
