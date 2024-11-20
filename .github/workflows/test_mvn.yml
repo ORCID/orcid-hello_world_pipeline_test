@@ -113,6 +113,7 @@ jobs:
         with:
           distribution: 'temurin'
           java-version: '11'
+          cache: maven # **/pom.xml
 
 ########################################################################################
       - name: "Test ${{ matrix.project }}"
