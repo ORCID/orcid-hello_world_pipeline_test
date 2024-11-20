@@ -88,7 +88,7 @@ echo ${ARTIFACT_URL}${ARTIFACT_REPO_PATH}
 export ARTIFACT_USER=$ARTIFACT_USER
 export ARTIFACT_PASSWORD=$ARTIFACT_PASSWORD
 
-for project in hello_world;do
+for project in hello-world;do
 
   build_log_file=~/log/orcid-source-${project}-${tag_numeric}.log
 
