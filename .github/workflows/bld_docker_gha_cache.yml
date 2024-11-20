@@ -94,6 +94,11 @@ jobs:
             context: .
             file: hello-world/Dockerfile
 
+          - artifact_name: hello-world-alt
+            docker_name: orcid/test/hello-world-alt
+            context: .
+            file: hello-world-alt/Dockerfile
+
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
