@@ -1,4 +1,4 @@
-name: build_debug
+name: bld_test_rel_tag
 
 on:
   workflow_call:
@@ -18,6 +18,11 @@ on:
         required: false
         default: "default"
         type: string
+      rel_tag:
+        description: Whether to tag the code
+        type: boolean
+        required: false
+        default: true
 
   workflow_dispatch:
     inputs:
@@ -42,7 +47,11 @@ on:
         required: false
         default: "default_branch"
         type: string
-
+      rel_tag:
+        description: Whether to tag the code
+        type: boolean
+        required: false
+        default: true
 
 # cancel running job if another commit comes in
 concurrency:
@@ -50,43 +59,27 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  seed_maven_cache:
-    uses: ./.github/workflows/seed_maven_cache.yml
+
+  lint:
+    uses: ./.github/workflows/lint.yml
+
+  test_mvn:
+    uses: ./.github/workflows/test_mvn.yml
     with:
       version_tag: ${{ inputs.version_tag }}
       bump: ${{ inputs.bump }}
       ref: ${{ inputs.ref }}
-
-  install_maven_dependencies:
-    uses: ./.github/workflows/install_maven_dependencies.yml
-    with:
-      version_tag: ${{ inputs.version_tag }}
-      bump: ${{ inputs.bump }}
-      ref: ${{ inputs.ref }}
-    needs:
-      - seed_maven_cache
-
-
-##############################################################################
-
-  mvn_test:
-    uses: ./.github/workflows/mvn_test.yml
-    with:
-      version_tag: ${{ inputs.version_tag }}
-      bump: ${{ inputs.bump }}
-      ref: ${{ inputs.ref }}
-      project: orcid-message-listener
       seed_maven_cache: false
       install_maven_dependencies: false
     needs:
-      - install_maven_dependencies
-
-  bld_ml:
-    uses: ./.github/workflows/bld_maven.yml
+      - lint
+##############################################################################
+  bld_mvn:
+    uses: ./.github/workflows/bld_mvn.yml
     secrets: inherit # pass all secrets for uploading assets
     needs:
-      - seed_maven_cache
-      - mvn_test
+      - lint
+      - test_mvn
     permissions:
       checks: write
       contents: read
@@ -96,6 +89,22 @@ jobs:
       version_tag: ${{ inputs.version_tag }}
       bump: ${{ inputs.bump }}
       ref: ${{ inputs.ref }}
-      project: orcid-message-listener
       seed_maven_cache: false
       install_maven_dependencies: false
+
+##############################################################################
+
+  rel_tag:
+    uses: ./.github/workflows/rel_tag.yml
+    needs: bld_mvn
+    if: ${{ inputs.rel_tag }}
+    with:
+      version_tag: ${{ inputs.version_tag }}
+      bump: ${{ inputs.bump }}
+      ref: ${{ inputs.ref }}
+    secrets: inherit # pass all secrets
+    permissions:
+      checks: write
+      contents: write
+      issues: read
+      pull-requests: write

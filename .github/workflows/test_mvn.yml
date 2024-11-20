@@ -1,4 +1,4 @@
-name: mvn_test
+name: test_mvn
 
 # run maven tests and publish results in one step
 
@@ -77,12 +77,13 @@ on:
 
 
 jobs:
-  mvn_test:
+  test_mvn:
 
     strategy:
       matrix:
         include:
           - project: hello_world
+          - project: hello_world_2
 
     runs-on: ubuntu-latest
     steps:

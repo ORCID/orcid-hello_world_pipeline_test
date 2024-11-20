@@ -1,5 +1,4 @@
-name: bld_maven
-run-name: bld-{{ inputs.project }}
+name: bld_mvn
 
 permissions:
   checks: write
@@ -83,7 +82,13 @@ on:
 
 
 jobs:
-  bld_maven:
+  bld_mvn:
+    strategy:
+      matrix:
+        include:
+          - project: hello_world
+          - project: hello_world_2
+
     runs-on: ubuntu-latest
     steps:
       - name: git-checkout-ref-action
@@ -167,20 +172,20 @@ jobs:
           find . -name '*.war'
           find . -name '*.jar'
         env:
-          project: "${{ inputs.project }}"
+          project: "${{ matrix.project }}"
 
 #
 # orcid-web customization
 #
 
       - name: setup node for angular static file
-        if: ${{ inputs.project == 'orcid-web' }}
+        if: ${{ matrix.project == 'orcid-web' }}
         uses: actions/setup-node@v3
         with:
           node-version: 18.7.0
 
       - name: build angular parts if we are building orcid-web
-        if: ${{ inputs.project == 'orcid-web' }}
+        if: ${{ matrix.project == 'orcid-web' }}
         run: |
           echo "Build angular_orcid_generated.js"
           cd orcid-nodejs
@@ -208,7 +213,7 @@ jobs:
 
         env:
           version_tag_numeric: "${{ steps.version.outputs.version_tag_numeric }}"
-          project: "${{ inputs.project }}"
+          project: "${{ matrix.project }}"
 
 ##################################################################################################################
 
@@ -227,5 +232,5 @@ jobs:
           ARTIFACT_REPO_PATH: "${{ secrets.ARTIFACT_REPO_PATH }}"
           ARTIFACT_USER: "${{ secrets.ARTIFACT_USER }}"
           ARTIFACT_PASSWORD: "${{ secrets.ARTIFACT_PASSWORD }}"
-          project: "${{ inputs.project }}"
+          project: "${{ matrix.project }}"
 

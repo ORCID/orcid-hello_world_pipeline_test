@@ -10,6 +10,7 @@
 
     <modules>
         <module>hello_world</module>
+        <module>hello_world_2</module>
     </modules>
 
     <properties>
