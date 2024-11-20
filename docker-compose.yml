@@ -1,6 +1,6 @@
 version: '2'
 services:
-  angular:
+  hello-world:
     image: ${DOCKER_REG_PRIVATE}/orcid/test/hello-world:${TAG:-0.0.1}
     #entrypoint: sleep infinity
     build:
