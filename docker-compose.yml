@@ -1,0 +1,8 @@
+version: '2'
+services:
+  angular:
+    image: ${DOCKER_REG_PRIVATE}/orcid/test/hello-world:${TAG:-0.0.1}
+    #entrypoint: sleep infinity
+    build:
+      context: .
+      dockerfile: hello-world/Dockerfile
