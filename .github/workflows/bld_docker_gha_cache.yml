@@ -91,7 +91,7 @@ jobs:
         include:
           - artifact_name: hello-world
             docker_name: orcid/test/hello-world
-            context: hello-world/
+            context: .
             file: hello-world/Dockerfile
 
     runs-on: ubuntu-latest
