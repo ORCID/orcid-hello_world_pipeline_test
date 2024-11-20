@@ -117,50 +117,6 @@ jobs:
         with:
           distribution: 'temurin'
           java-version: '11'
-######################################################################################################################
-# handle restoring a custom gha cache
-
-      - name: if not installing dependencies restore special previous git_sha cache
-        if: ${{ ! inputs.install_maven_dependencies }}
-        uses: actions/cache@v4
-        with:
-          path: ~/.m2/repository
-          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}-${{ steps.version.outputs.version_tag_numeric }}-${{ github.sha }}
-          restore-keys: |
-            ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}-${{ steps.version.outputs.version_tag_numeric }}-${{ github.sha }}
-
-      - name: bump version of the parent pom and connected projects
-        if: ${{ ! inputs.install_maven_dependencies }}
-        run: |
-          mvn -T 1C --batch-mode versions:set -DskipTests \
-              -DnewVersion="$version_tag_numeric" -DgenerateBackupPoms=false
-        env:
-          version_tag_numeric: "${{ steps.version.outputs.version_tag_numeric }}"
-
-########################################################################################
-
-      - name: if installing dependencies use a standard cache key name
-        if: ${{ inputs.install_maven_dependencies }}
-        uses: actions/cache@v4
-        with:
-          path: ~/.m2/repository
-          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}-seed-cache
-          restore-keys: |
-            ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}-seed-cache
-
-      - name: seed_maven_cache
-        if: ${{ inputs.seed_maven_cache }}
-        id: cache
-        uses: ORCID/ORCID-Source-cache-action@main
-        with:
-          version_tag_numeric: ${{ steps.version.outputs.version_tag_numeric }}
-
-      - name: install_dependencies and bump version
-        if: ${{ inputs.install_maven_dependencies }}
-        id: install_dependencies
-        uses: ORCID/ORCID-Source-dependencies-action@main
-        with:
-          version_tag_numeric: ${{ steps.version.outputs.version_tag_numeric }}
 
       - name: build our project
         run: |
@@ -172,47 +128,6 @@ jobs:
           find . -name '*.war'
           find . -name '*.jar'
         env:
-          project: "${{ matrix.project }}"
-
-#
-# orcid-web customization
-#
-
-      - name: setup node for angular static file
-        if: ${{ matrix.project == 'orcid-web' }}
-        uses: actions/setup-node@v3
-        with:
-          node-version: 18.7.0
-
-      - name: build angular parts if we are building orcid-web
-        if: ${{ matrix.project == 'orcid-web' }}
-        run: |
-          echo "Build angular_orcid_generated.js"
-          cd orcid-nodejs
-          mvn -T 1C --batch-mode -P ci clean compile \
-            -Dnodejs.workingDirectory="${{ github.workspace }}/orcid-web/src/main/webapp/static/javascript/ng1Orcid" \
-            -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn
-
-          echo "Copying angular_orcid_generated to its final destination"
-          cp ${{ github.workspace }}/orcid-web/src/main/webapp/static/javascript/ng1Orcid/angular_orcid_generated.js ${{ github.workspace }}/orcid-web/target/orcid-web/static/javascript/ng1Orcid/
-
-          echo "Packaging orcid-web"
-          rm -f ${{ github.workspace }}/orcid-web/target/orcid-web.war
-          cd ${{ github.workspace }}/orcid-web/target/orcid-web
-
-          # have a file on the webserver we can hit
-          echo "$version_tag_numeric" > ${{ github.workspace }}/orcid-web/target/orcid-web/static/version
-
-          echo "Creating the war file"
-          jar -cf orcid-web.war .
-
-          # check_error "Creating the orcid-web.war file"
-          echo "Moving war file to the target folder"
-          cp orcid-web.war ${{ github.workspace }}/orcid-web/target/
-          echo "orcid-web.war is ready"
-
-        env:
-          version_tag_numeric: "${{ steps.version.outputs.version_tag_numeric }}"
           project: "${{ matrix.project }}"
 
 ##################################################################################################################
