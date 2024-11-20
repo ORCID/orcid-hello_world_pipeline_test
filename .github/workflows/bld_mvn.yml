@@ -122,7 +122,7 @@ jobs:
 
       - name: if not installing dependencies restore special previous git_sha cache
         if: ${{ ! inputs.install_maven_dependencies }}
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: ~/.m2/repository
           key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}-${{ steps.version.outputs.version_tag_numeric }}-${{ github.sha }}
@@ -141,7 +141,7 @@ jobs:
 
       - name: if installing dependencies use a standard cache key name
         if: ${{ inputs.install_maven_dependencies }}
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: ~/.m2/repository
           key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}-seed-cache
