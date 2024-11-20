@@ -87,7 +87,7 @@ jobs:
       matrix:
         include:
           - project: hello_world
-          - project: hello_world_2
+#          - project: hello_world_2
 
     runs-on: ubuntu-latest
     steps:
