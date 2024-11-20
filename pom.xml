@@ -30,6 +30,15 @@
                         <target>${maven.compiler.target}</target>
                     </configuration>
                 </plugin>
+               <plugin>
+                 <groupId>org.apache.maven.plugins</groupId>
+                 <artifactId>maven-deploy-plugin</artifactId>
+                 <version>3.0.0-M2</version>
+                 <configuration>
+                     <failOnMissingWebXml>false</failOnMissingWebXml>
+                </configuration>
+              </plugin>
+
             </plugins>
         </pluginManagement>
     </build>
