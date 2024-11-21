@@ -147,7 +147,7 @@ jobs:
           push: false
           tags: ${{ secrets.DOCKER_REG_PRIVATE }}/${{ matrix.docker_name}}:${{ steps.version.outputs.version_tag_numeric }}
           context: ${{ matrix.context }}
-          cache-from: type=registry,ref=user/app:buildcache
-          cache-to: type=registry,ref=user/app:buildcache,mode=max
+          cache-from: type=registry,ref=${{ secrets.DOCKER_REG_PRIVATE }}/${{ matrix.docker_name }}:cache
+          cache-to: type=registry,mode=max,image-manifest=true,oci-mediatypes=true,ref=${{ secrets.DOCKER_REG_PRIVATE }}/${{ matrix.docker_name }}:cache
           file: ${{ steps.dynamic_defaults.outputs.default_file }}
 
