@@ -144,7 +144,7 @@ jobs:
 
       - uses: docker/build-push-action@v6
         with:
-          push: false
+          push: true
           tags: ${{ secrets.DOCKER_REG_PRIVATE }}/${{ matrix.docker_name}}:${{ steps.version.outputs.version_tag_numeric }}
           context: ${{ matrix.context }}
           cache-from: type=registry,ref=${{ secrets.DOCKER_REG_PRIVATE }}/${{ matrix.docker_name }}:cache
